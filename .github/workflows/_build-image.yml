@@ -48,18 +48,22 @@ jobs:
         id: tags
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          TAG: ${{ inputs.tag }}
+          INCLUDE_LATEST_TAG: ${{ inputs.include_latest_tag }}
         run: |
           append_tag() {
             TAGS="${TAGS}"$'\n'"$1"
           }
 
           TAGS=""
-          append_tag "ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}:${{ inputs.tag }}"
-          append_tag "${DOCKERHUB_USERNAME}/${{ inputs.image_name }}:${{ inputs.tag }}"
+          append_tag "ghcr.io/${REPOSITORY_OWNER}/${IMAGE_NAME}:${TAG}"
+          append_tag "${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${TAG}"
 
-          if [ "${{ inputs.include_latest_tag }}" = "true" ]; then
-            append_tag "ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}:latest"
-            append_tag "${DOCKERHUB_USERNAME}/${{ inputs.image_name }}:latest"
+          if [ "${INCLUDE_LATEST_TAG}" = "true" ]; then
+            append_tag "ghcr.io/${REPOSITORY_OWNER}/${IMAGE_NAME}:latest"
+            append_tag "${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
           fi
 
           {
